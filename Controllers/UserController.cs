@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using LutayCRUD.Models;
 using LutayCRUD.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,19 +9,10 @@ namespace LutayCRUD.Controllers
     public class UserController : Controller
     {
         IUserRegistrationService registrationService;
-        IUserAdminService adminService;
 
-        public UserController(IUserRegistrationService registrationService,
-            IUserAdminService adminService)
+        public UserController(IUserRegistrationService registrationService)
         {
             this.registrationService = registrationService;
-            this.adminService = adminService;
-        }
-
-        [HttpGet()]
-        public async Task<List<User>> GetAll()
-        {
-            return await adminService.GetAll();
         }
 
         [HttpGet("{user}")]
@@ -39,7 +29,7 @@ namespace LutayCRUD.Controllers
                 return BadRequest();
             }
             await registrationService.AddUser(user);
-            return Accepted();
+            return Ok();
         }
     }
 }

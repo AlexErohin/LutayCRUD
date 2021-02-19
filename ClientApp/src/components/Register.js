@@ -5,34 +5,53 @@ export class Register extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            user: { firstName: "", lastName: "", birthday: undefined, phoneNumber: "", favoriteColors: 0, favoriteDrinks: 0, },
+            user: { firstName: "", lastName: "", birthday: undefined, phoneNumber: "", favoriteColors: [], favoriteDrinks: [], },
             isInvalid: true,
         };
-        this.handleChange = this.handleChange.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleSelectChange = this.handleSelectChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleSubmit(event) {
         event.preventDefault();
+        let user = Object.assign({}, this.state.user);
+        user.favoriteColors = user.favoriteColors.reduce((x, v, i, a) => x + parseInt(v), 0);
+        user.favoriteDrinks = user.favoriteDrinks.reduce((x, v, i, a) => x + parseInt(v), 0);
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.state.user)
+            body: JSON.stringify(user)
         };
         fetch('api/User/Register', requestOptions)
-            .then(response => response.json())
-            .then(alert('Зарегистрирован ' + this.state.user.firstName));
+            .then(response => {
+                if (response.ok) {
+                    alert("Успешно зарегистрирован");
+                } else {
+                    alert("Ошибка регистрации");
+                }
+            });
     }
 
-    handleChange(event) {
+    handleInputChange(event) {
         const target = event.target;
         const name = target.name;
         this.setState(prevState => {
             let user = Object.assign({}, prevState.user);
             user[name] = target.value;
             return { user };
+        }, () => {
+            this.handleValidation();
         });
-        this.handleValidation();
+    }
+    handleSelectChange(event) {
+        const target = event.target;
+        const name = target.name;
+        this.setState(prevState => {
+            let user = Object.assign({}, prevState.user);
+            user[name] = Array.from(target.selectedOptions, option => option.value);
+            return { user };
+        });
     }
     handleValidation() {
         let invalid = true;
@@ -56,9 +75,9 @@ export class Register extends Component {
                             size="30"
                             placeholder="Имя"
                             value={this.state.user.firstName}
-                            onChange={this.handleChange} />
+                            onChange={this.handleInputChange} />
                     </label>
-                    <br/>
+                    <br />
                     <label>
                         Фамилия*
                         <input
@@ -67,7 +86,7 @@ export class Register extends Component {
                             size="30"
                             placeholder="Фамилия"
                             value={this.state.user.lastName}
-                            onChange={this.handleChange} />
+                            onChange={this.handleInputChange} />
                     </label>
                     <br />
                     <label>
@@ -77,7 +96,7 @@ export class Register extends Component {
                             type="date"
                             size="30"
                             value={this.state.user.birthday}
-                            onChange={this.handleChange} />
+                            onChange={this.handleInputChange} />
                     </label>
                     <br />
                     <label>
@@ -88,7 +107,7 @@ export class Register extends Component {
                             size="30"
                             placeholder="+0000000"
                             value={this.state.user.phoneNumber}
-                            onChange={this.handleChange} />
+                            onChange={this.handleInputChange} />
                     </label>
                     <br />
                     <label>
@@ -97,7 +116,7 @@ export class Register extends Component {
                             name="favoriteColors"
                             multiple={true}
                             value={this.state.user.favoriteColors}
-                            onChange={this.handleChange}>
+                            onChange={this.handleSelectChange}>
                             <option value="1">Синий</option>
                             <option value="2">Желтый</option>
                             <option value="4">Красный</option>
@@ -110,7 +129,7 @@ export class Register extends Component {
                             name="favoriteDrinks"
                             multiple={true}
                             value={this.state.user.favoriteDrinks}
-                            onChange={this.handleChange}>
+                            onChange={this.handleSelectChange}>
                             <option value="1">Чай</option>
                             <option value="2">Кофе</option>
                             <option value="4">Сок</option>

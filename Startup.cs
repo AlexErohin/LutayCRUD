@@ -1,5 +1,7 @@
+using LutayCRUD.Auth;
 using LutayCRUD.Context;
 using LutayCRUD.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -32,8 +34,12 @@ namespace LutayCRUD
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddAuthentication("SimpleAuth")
+                .AddScheme<AuthenticationSchemeOptions, SimpleAuthHandler>("SimpleAuth", null);
+
             services.AddScoped<IUserRegistrationService, UserRegistrationService>();
-            services.AddScoped<IUserAdminService, UserAdminService>();
+            services.AddScoped<IAdminService, AdminService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +56,12 @@ namespace LutayCRUD
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
