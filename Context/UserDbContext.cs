@@ -25,7 +25,33 @@ namespace LutayCRUD.Context
             builder.Entity<User>()
                 .Property(x => x.FavoriteDrinks)
                 .HasConversion<int>();
+            
+            Seed(builder);
+        }
 
+        private void Seed(ModelBuilder builder)
+        {
+            builder.Entity<User>().HasData(
+                new User
+                {
+                    UserId = Guid.NewGuid(),
+                    FirstName = "Alex",
+                    LastName = "L",
+                    Birthday = new DateTime(2000, 2, 17),
+                    PhoneNumber = "+15556541122",
+                    FavoriteColors = User.Color.Red | User.Color.Yellow, 
+                    FavoriteDrinks = User.Drink.Water
+                },
+                new User
+                {
+                    UserId = Guid.NewGuid(),
+                    FirstName = "Xander",
+                    LastName = "Tay",
+                    Birthday = new DateTime(1984, 12, 31),
+                    PhoneNumber = "+05551237845",
+                    FavoriteColors = 0,
+                    FavoriteDrinks = User.Drink.Tea | User.Drink.Water
+                });
         }
     }
 }
