@@ -1,7 +1,9 @@
+using LutayCRUD.Context;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +22,9 @@ namespace LutayCRUD
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddDbContext<UserDbContext>
+                (opts => opts.UseSqlServer(Configuration.GetConnectionString("local")));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
