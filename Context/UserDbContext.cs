@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using LutayCRUD.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace LutayCRUD.Context
@@ -14,7 +16,9 @@ namespace LutayCRUD.Context
             base.OnModelCreating(builder);
 
             builder.Entity<User>().HasKey(x => x.UserId);
-
+            builder.Entity<User>()
+                .Property(x => x.UserId)
+                .HasDefaultValueSql("NEWID()");
             builder.Entity<User>().Property(x => x.FirstName).IsRequired();
             builder.Entity<User>().Property(x => x.LastName).IsRequired();
             builder.Entity<User>().Property(x => x.PhoneNumber).IsRequired();
@@ -39,8 +43,8 @@ namespace LutayCRUD.Context
                     LastName = "L",
                     Birthday = new DateTime(2000, 2, 17),
                     PhoneNumber = "+15556541122",
-                    FavoriteColors = User.Color.Red | User.Color.Yellow, 
-                    FavoriteDrinks = User.Drink.Water
+                    FavoriteColors = Color.Red | Color.Yellow, 
+                    FavoriteDrinks = Drink.Water
                 },
                 new User
                 {
@@ -50,7 +54,7 @@ namespace LutayCRUD.Context
                     Birthday = new DateTime(1984, 12, 31),
                     PhoneNumber = "+05551237845",
                     FavoriteColors = 0,
-                    FavoriteDrinks = User.Drink.Tea | User.Drink.Water
+                    FavoriteDrinks = Drink.Tea | Drink.Water
                 });
         }
     }
