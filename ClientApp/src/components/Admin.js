@@ -8,11 +8,15 @@ export class Admin extends Component {
         this.state = {
             users: [],
             login: "",
-            password: ""
+            password: "",
+            colorFilter: 0,
+            drinkFilter: 0
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
     }
+
+
     componentDidMount() {
         if (localStorage.getItem('admin') !== null) {
             this.fetchTable();
@@ -88,27 +92,40 @@ export class Admin extends Component {
         });
     }
 
-    static renderUsersTable(users) {
-        return (
-            <table className='table'>
-                <thead>
-                    <tr>
-                        <th>Имя</th>
-                        <th>Фамилия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user =>
-                        <tr>
-                            <td>{user.firstName}</td>
-                            <td>{user.lastName}</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        );
+    static flagsToColors(flag) {
+        let result = "";
+        result += (flag & 1) == 1 ? "Синий; " : "";
+        result += (flag & 2) == 2 ? "Желтый; " : "";
+        result += (flag & 4) == 4 ? "Красный; " : "";
+
+        return result;
     }
 
+    static flagsToDrinks(flag) {
+        let result = "";
+        result += (flag & 1) == 1 ? "Чай; " : "";
+        result += (flag & 2) == 2 ? "Кофе; " : "";
+        result += (flag & 4) == 4 ? "Сок; " : "";
+        result += (flag & 8) == 8 ? "Вода; " : "";
+
+        return result;
+    }
+    static formatDate(date) {
+        if (!date) {
+            return;
+        }
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+
+        return [day, month, year].join('.');
+    }
     render() {
         let auth;
         if (localStorage.getItem('admin') === null) {
@@ -126,7 +143,60 @@ export class Admin extends Component {
                     <input type="submit" value="Войти" />
                 </form>;
         } else {
-            auth = [<button onClick={() => this.logout()}>Выйти</button>, Admin.renderUsersTable(this.state.users)];
+            auth = 
+                <div>
+                    <button onClick={() => this.logout()}>Выйти</button>
+                    <table className='table'>
+                        <thead>
+                            <tr>
+                                <th>Имя</th>
+                                <th>Фамилия</th>
+                                <th>Дата рождения</th>
+                                <th>Телефон</th>
+                                <th>Цвета</th>
+                                <th>Напитки</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {this.state.users
+                            .filter(user => (user.favoriteColors & this.state.colorFilter) == this.state.colorFilter)
+                            .filter(user => (user.favoriteDrinks & this.state.drinkFilter) == this.state.drinkFilter)
+                            .map(user =>
+                                <tr>
+                                    <td>{user.firstName}</td>
+                                    <td>{user.lastName}</td>
+                                    <td>{Admin.formatDate(user.birthday)}</td>
+                                    <td>{user.phoneNumber}</td>
+                                    <td>{Admin.flagsToColors(user.favoriteColors)}</td>
+                                    <td>{Admin.flagsToDrinks(user.favoriteDrinks)}</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                    <br />
+                    <label>
+                        Фильтр цвета
+                        <select onChange={(event) => this.setState({ colorFilter: parseInt(event.target.value) })}>
+
+                            <option value="0">Без фильтра</option>
+                            <option value="1">Синий</option>
+                            <option value="2">Желтый</option>
+                            <option value="4">Красный</option>
+                        </select>
+                    </label>
+                    <br />
+                    <label>
+                        Фильтр напитка
+                        <select onChange={(event) => this.setState({ drinkFilter: parseInt(event.target.value) })}>
+
+                            <option value="0">Без фильтра</option>
+                            <option value="1">Чай</option>
+                            <option value="2">Кофе</option>
+                            <option value="4">Сок</option>
+                            <option value="8">Вода</option>
+                        </select>
+                    </label>
+                </div>;
         }
         return (
             <div>
