@@ -1,12 +1,11 @@
-﻿using LutayCRUD.Common;
-using LutayCRUD.Context;
+﻿using LutayCRUD.Context;
+using LutayCRUD.Models;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using UserModel = LutayCRUD.Models.User;
 
 namespace LutayCRUD.Services
 {
-    public class UserRegistrationService
+    public class UserRegistrationService : IUserRegistrationService
     {
         private readonly UserDbContext context;
 
@@ -15,24 +14,16 @@ namespace LutayCRUD.Services
             this.context = context;
         }
 
-        public bool ValidateUser(UserModel model)
+        public bool ValidateUser(User model)
         {
             return model.FirstName != string.Empty &&
                 model.LastName != string.Empty &&
+                model.PhoneNumber != null &&
                 Regex.Match(model.PhoneNumber, @"^(\+[0-9]+)$").Success;
         }
-        public async Task AddUser(UserModel model)
+        public async Task AddUser(User model)
         {
-            var user = new User
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Birthday = model.Birthday,
-                PhoneNumber = model.PhoneNumber,
-                FavoriteColors = (Color)model.FavoriteColors,
-                FavoriteDrinks = (Drink)model.FavoriteDrinks
-            };
-            await context.Users.AddAsync(user);
+            await context.Users.AddAsync(model);
             await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }

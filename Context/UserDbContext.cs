@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using LutayCRUD.Common;
+using LutayCRUD.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LutayCRUD.Context
