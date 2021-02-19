@@ -3,6 +3,7 @@ import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Admin } from './components/Admin';
 import { Register } from './components/Register';
+import "moment";
 
 export default class App extends Component {
   displayName = App.name

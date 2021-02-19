@@ -1,23 +1,28 @@
 ﻿import React, { Component } from 'react';
+import DatePicker from "react-datepicker";
+import moment from 'moment'
+
+import "react-datepicker/dist/react-datepicker.css";
 
 export class Register extends Component {
     displayName = Register.name
     constructor(props) {
         super(props);
         this.state = {
-            user: { firstName: "", lastName: "", birthday: undefined, phoneNumber: "", favoriteColors: [], favoriteDrinks: [], },
+            user: { firstName: "", lastName: "", birthday: moment(), phoneNumber: "", favoriteColors: [], favoriteDrinks: [], },
             isInvalid: true,
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSelectChange = this.handleSelectChange.bind(this);
+        this.handleBirthdayChange = this.handleBirthdayChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleSubmit(event) {
         event.preventDefault();
         let user = Object.assign({}, this.state.user);
-        user.favoriteColors = user.favoriteColors.reduce((x, v, i, a) => x + parseInt(v), 0);
-        user.favoriteDrinks = user.favoriteDrinks.reduce((x, v, i, a) => x + parseInt(v), 0);
+        user.favoriteColors = user.favoriteColors.reduce((x, v, i, a) => x + parseInt(v, 10), 0);
+        user.favoriteDrinks = user.favoriteDrinks.reduce((x, v, i, a) => x + parseInt(v, 10), 0);
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -44,6 +49,15 @@ export class Register extends Component {
             this.handleValidation();
         });
     }
+
+    handleBirthdayChange(date) {
+        this.setState(prevState => {
+            let user = Object.assign({}, prevState.user);
+            user.birthday = moment(date);
+            return { user };
+        });
+    }
+
     handleSelectChange(event) {
         const target = event.target;
         const name = target.name;
@@ -91,12 +105,10 @@ export class Register extends Component {
                     <br />
                     <label>
                         Дата рождения
-                        <input
-                            name="birthday"
-                            type="date"
-                            size="30"
-                            value={this.state.user.birthday}
-                            onChange={this.handleInputChange} />
+                        <DatePicker
+                            dateFormat="DD.MM.yyyy"
+                            selected={this.state.user.birthday}
+                            onChange={this.handleBirthdayChange} />
                     </label>
                     <br />
                     <label>
@@ -112,6 +124,7 @@ export class Register extends Component {
                     <br />
                     <label>
                         Вопрос 1: Какой цвет вам больше нравится?
+                    <br />
                         <select
                             name="favoriteColors"
                             multiple={true}
@@ -125,6 +138,7 @@ export class Register extends Component {
                     <br />
                     <label>
                         Вопрос 2: Какой напиток вы предпочитаете?
+                    <br />
                         <select
                             name="favoriteDrinks"
                             multiple={true}
@@ -137,7 +151,7 @@ export class Register extends Component {
                         </select>
                     </label>
                     <br />
-                    <input type="submit" disabled={this.state.isInvalid} value="Подтвердить" />
+                    <input type="submit" disabled={this.state.isInvalid} value="Зарегистрировать" />
                 </form>
             </div>
         );
